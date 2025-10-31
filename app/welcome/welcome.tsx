@@ -25,13 +25,13 @@ export function Welcome() {
               What&apos;s next?
             </p>
             <ul>
-              {resources.map(({ href, text, icon }) => (
+              {resources.map(({ href, text, icon, internal }) => (
                 <li key={href}>
                   <a
                     className="flex gap-3 items-center self-stretch p-3 leading-normal text-blue-700 group hover:underline dark:text-blue-500"
                     href={href}
-                    target="_blank"
-                    rel="noreferrer"
+                    target={internal ? undefined : "_blank"}
+                    rel={internal ? undefined : "noreferrer"}
                   >
                     {icon}
                     {text}
@@ -47,6 +47,27 @@ export function Welcome() {
 }
 
 const resources = [
+  {
+    href: "/dashboard",
+    text: "Windows Performance Monitor",
+    internal: true,
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        className="stroke-gray-600 group-hover:stroke-current dark:stroke-gray-300"
+      >
+        <path
+          d="M9 3.5V2m6 1.5V2m-9 9h12M4 21h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v13a1 1 0 001 1zm8-9v6m3-4v4m-6-2v2"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
   {
     href: "https://reactrouter.com/docs",
     text: "React Router Docs",
