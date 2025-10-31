@@ -1,11 +1,12 @@
-# Welcome to React Router! (Experimental RSC)
+# Windash - Windows PC Performance Monitor
 
-⚠️ **EXPERIMENTAL**: This template demonstrates React Server Components with React Router. This is experimental technology and not recommended for production use.
+⚠️ **EXPERIMENTAL**: This app uses React Server Components with React Router. This is experimental technology and not recommended for production use.
 
-A modern template for exploring React Server Components (RSC) with React Router, powered by Vite.
+A real-time Windows PC performance monitoring dashboard built with React Server Components (RSC) and React Router, powered by Vite.
 
 ## Features
 
+- 📊 **Real-time PC metrics monitoring** (CPU, Memory, Disk)
 - 🧪 **Experimental React Server Components**
 - 🚀 Server-side rendering with RSC
 - ⚡️ Hot Module Replacement (HMR)
