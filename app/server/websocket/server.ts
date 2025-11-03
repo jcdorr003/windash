@@ -12,7 +12,7 @@ interface AgentConnection {
 const connections = new Map<string, AgentConnection>();
 
 export function setupWebSocketServer(server: Server) {
-  const wss = new WebSocketServer({ 
+  const wss = new WebSocketServer({
     server,
     path: '/agent'
   });
@@ -50,10 +50,10 @@ export function setupWebSocketServer(server: Server) {
       // Store connection
       const deviceId = device.id;
       connections.set(deviceId, { deviceId, hostId, ws });
-      
+
       // Update device status to online
       await updateDeviceStatus(deviceId, true);
-      
+
       console.log(`Device connected: ${device.name} (${deviceId})`);
 
       // Handle messages from agent
@@ -64,10 +64,10 @@ export function setupWebSocketServer(server: Server) {
           if (message.type === 'metrics' && message.samples) {
             // Store metrics batch
             await storeMetricsBatch(deviceId, message.samples as MetricSample[]);
-            
+
             // Update last seen
             await updateDeviceStatus(deviceId, true);
-            
+
             console.log(`Stored ${message.samples.length} metric samples from ${device.name}`);
           }
         } catch (error) {

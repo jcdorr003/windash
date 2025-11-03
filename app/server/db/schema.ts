@@ -38,26 +38,26 @@ export const metrics = pgTable('metrics', {
   id: text('id').primaryKey(),
   deviceId: text('device_id').notNull().references(() => devices.id, { onDelete: 'cascade' }),
   timestamp: timestamp('timestamp').notNull(),
-  
+
   // CPU metrics
   cpuTotal: real('cpu_total').notNull(), // Total CPU %
   cpuPerCore: jsonb('cpu_per_core').notNull(), // Array of per-core %
-  
+
   // Memory metrics
   memUsed: bigint('mem_used', { mode: 'number' }).notNull(),
   memTotal: bigint('mem_total', { mode: 'number' }).notNull(),
-  
+
   // Disk metrics
   disk: jsonb('disk').notNull(), // Array of {name, used, total}
-  
+
   // Network metrics
   netTxBps: bigint('net_tx_bps', { mode: 'number' }).notNull(),
   netRxBps: bigint('net_rx_bps', { mode: 'number' }).notNull(),
-  
+
   // System metrics
   uptimeSec: integer('uptime_sec').notNull(),
   procCount: integer('proc_count').notNull(),
-  
+
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

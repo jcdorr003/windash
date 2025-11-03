@@ -11,7 +11,7 @@ const server = createServer((req, res) => {
     res.end(JSON.stringify({ status: 'ok', service: 'websocket' }));
     return;
   }
-  
+
   res.writeHead(404);
   res.end('WebSocket server only');
 });

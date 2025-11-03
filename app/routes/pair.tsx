@@ -26,7 +26,7 @@ export async function action({ request }: Route.ActionArgs) {
     // TODO: Get userId from session when auth is implemented
     // For now, use a temporary user ID
     const tempUserId = "temp-user-1";
-    
+
     // Generate a temporary hostId (will be replaced by agent's actual hostId)
     const hostId = `host-${Date.now()}`;
 
