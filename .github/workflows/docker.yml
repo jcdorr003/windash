@@ -32,8 +32,11 @@ jobs:
             jcdorr3/windash:latest
             jcdorr3/windash:${{ github.ref_name }}
       
+      - name: Install Syft
+        run: |
+          wget https://github.com/anchore/syft/releases/download/v0.101.0/syft_0.101.0_linux_amd64.tar.gz
+          tar -xzf syft_0.101.0_linux_amd64.tar.gz
+          sudo mv syft /usr/local/bin/
+
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0.15.3
-        with:
-          image: "docker-image://jcdorr3/windash:latest"
-          output-file: sbom.json
+        run: syft docker:windash:latest -o json > sbom.json
