@@ -43,6 +43,6 @@
   "postCreateCommand": "pnpm install",
   // Run commands when attaching to the container
   "postAttachCommand": "echo '🚀 Windash Dev Container Ready! Run: pnpm dev'",
-  // Comment out to connect as root instead
-  "remoteUser": "node"
+  // Use root for development to avoid permission errors
+  "remoteUser": "root"
 }
