@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main    # Production
-      - dev     # Development
+    # Only main branch triggers Docker build and push
 
 jobs:
   build-and-push:
