@@ -27,6 +27,13 @@ jobs:
         with:
           context: .
           push: true
+          provenance: true
           tags: |
             jcdorr3/windash:latest
             jcdorr3/windash:${{ github.ref_name }}
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0.15.3
+        with:
+          image: jcdorr3/windash:latest
+          output-file: sbom.json
