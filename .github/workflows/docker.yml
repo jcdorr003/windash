@@ -28,18 +28,8 @@ jobs:
           context: .
           push: true
           provenance: true
+          sbom: true
           tags: |
             jcdorr3/windash:latest
             jcdorr3/windash:${{ github.ref_name }}
 
-      - name: Build local Docker image for SBOM
-        run: docker build -t windash:latest .
-      
-      - name: Install Syft
-        run: |
-          wget https://github.com/anchore/syft/releases/download/v0.101.0/syft_0.101.0_linux_amd64.tar.gz
-          tar -xzf syft_0.101.0_linux_amd64.tar.gz
-          sudo mv syft /usr/local/bin/
-
-      - name: Generate SBOM
-        run: syft docker:windash:latest -o json > sbom.json
