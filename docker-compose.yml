@@ -1,6 +1,26 @@
 version: '3.9'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: windash-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=windash
+      - POSTGRES_PASSWORD=windash
+      - POSTGRES_DB=windash
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - windash-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U windash"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
   windash:
     image: windash:latest
     build:
@@ -10,11 +30,18 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - WS_PORT=3001
+      - DATABASE_URL=postgres://windash:windash@postgres:5432/windash
     networks:
       - windash-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "node app/server/websocket-server.js & pnpm start"
     # Uncomment for resource limits
     # deploy:
     #   resources:
@@ -43,3 +70,6 @@ services:
 networks:
   windash-network:
     driver: bridge
+
+volumes:
+  postgres-data:
