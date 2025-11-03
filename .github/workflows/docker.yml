@@ -32,8 +32,8 @@ jobs:
             jcdorr3/windash:latest
             jcdorr3/windash:${{ github.ref_name }}
 
-        - name: Build local Docker image for SBOM
-          run: docker build -t windash:latest .
+      - name: Build local Docker image for SBOM
+        run: docker build -t windash:latest .
       
       - name: Install Syft
         run: |
