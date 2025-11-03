@@ -5,8 +5,8 @@ FROM node:20-alpine
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install git for dev tools
-RUN apk add --no-cache git zsh
+# Install git, zsh, and bash for dev tools and VS Code features
+RUN apk add --no-cache git zsh bash
 
 # Set working directory
 WORKDIR /workspace
