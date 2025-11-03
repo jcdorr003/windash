@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1
+
+FROM node:20-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Install git for dev tools
+RUN apk add --no-cache git zsh
+
+# Set working directory
+WORKDIR /workspace
+
+# Install dependencies (will be overridden by volume mount in dev)
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
+
+# Expose Vite dev server port
+EXPOSE 5173
+
+# Set environment
+ENV NODE_ENV=development
+
+# Default command (can be overridden in docker-compose.dev.yml)
+CMD ["pnpm", "dev"]

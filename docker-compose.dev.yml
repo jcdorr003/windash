@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  windash-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: windash-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Mount source code for hot reload
+      - .:/workspace:cached
+      # Use named volumes for node_modules to avoid conflicts
+      - node_modules:/workspace/node_modules
+      # Mount pnpm cache for faster installs
+      - pnpm-store:/home/node/.local/share/pnpm/store
+    environment:
+      - NODE_ENV=development
+    command: pnpm dev
+    networks:
+      - windash-dev-network
+    stdin_open: true
+    tty: true
+
+volumes:
+  node_modules:
+  pnpm-store:
+
+networks:
+  windash-dev-network:
+    driver: bridge

@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  windash:
+    image: windash:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: windash
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - windash-network
+    # Uncomment for resource limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.windash.description=System Performance Dashboard"
+      - "com.windash.version=1.0"
+      # Traefik labels (uncomment if using Traefik)
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.windash.rule=Host(`windash.yourdomain.com`)"
+      # - "traefik.http.routers.windash.entrypoints=websecure"
+      # - "traefik.http.routers.windash.tls.certresolver=letsencrypt"
+      # - "traefik.http.services.windash.loadbalancer.server.port=3000"
+
+networks:
+  windash-network:
+    driver: bridge

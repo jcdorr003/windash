@@ -1,0 +1,53 @@
+{
+  "name": "Windash Development",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "windash-dev",
+  "workspaceFolder": "/workspace",
+  // Configure tool-specific properties
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "usernamehw.errorlens"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "typescript.enablePromptUseWorkspaceTsdk": true,
+        "files.eol": "\n",
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  },
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  // Use 'forwardPorts' to make a list of ports inside the container available locally
+  "forwardPorts": [
+    5173
+  ],
+  // Set port attributes
+  "portsAttributes": {
+    "5173": {
+      "label": "Windash Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+  // Run commands after the container is created
+  "postCreateCommand": "pnpm install",
+  // Run commands when attaching to the container
+  "postAttachCommand": "echo '🚀 Windash Dev Container Ready! Run: pnpm dev'",
+  // Comment out to connect as root instead
+  "remoteUser": "node"
+}

@@ -26,42 +26,112 @@ A real-time system performance monitoring dashboard showcasing React Server Comp
 
 ## 🚀 Getting Started
 
-### Prerequisites
+You can run Windash in three ways: **Docker (recommended)**, **Dev Containers**, or **Local development**.
 
-- Node.js 18+ (built with pnpm but npm works too)
+### 🐳 Option 1: Docker (Production-Ready)
 
-### Installation
-
-Install dependencies:
+The easiest way to deploy Windash alongside your other self-hosted services:
 
 ```bash
-# Using pnpm (recommended)
-pnpm install
+# Build and run with Docker Compose
+docker compose up -d
 
-# Or using npm
-npm install
+# Or build the image and run manually
+docker build -t windash .
+docker run -d -p 3000:3000 --name windash windash
 ```
 
-### Development
+Access the dashboard at `http://localhost:3000`
 
-Start the development server:
+**Docker Features:**
+- ✅ Multi-stage build for optimized image size
+- ✅ Non-root user for security
+- ✅ Health checks included
+- ✅ Ready for Traefik/reverse proxy integration
+- ✅ Production-optimized with pnpm
+
+### 🔧 Option 2: Dev Containers (Recommended for Development)
+
+Open the project in VS Code and use Dev Containers for a consistent development environment:
+
+1. **Install**: [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+2. **Open**: Command Palette → "Dev Containers: Reopen in Container"
+3. **Develop**: Hot reload, all tools pre-configured
+
+**Dev Container Benefits:**
+- ✅ Isolated environment, no local dependencies
+- ✅ Consistent across team members
+- ✅ Pre-configured VS Code settings & extensions
+- ✅ Volume mounts for instant file sync
+
+### 💻 Option 3: Local Development
+
+If you prefer running locally without Docker:
+
+**Prerequisites:** Node.js 18+ (pnpm recommended)
 
 ```bash
-# Using pnpm
-pnpm dev
+# Install dependencies
+pnpm install
 
-# Or using npm
-npm run dev
+# Start dev server
+pnpm dev
 ```
 
 Visit `http://localhost:5173` to see your dashboard with live simulated metrics.
 
 ## 📦 Building & Deployment
 
-### Production Build
+### 🐳 Docker Deployment (Recommended)
+
+**Production deployment with Docker Compose:**
 
 ```bash
+# Build and start
+docker compose up -d --build
+
+# View logs
+docker compose logs -f windash
+
+# Stop
+docker compose down
+
+# Update to latest code
+git pull
+docker compose up -d --build
+```
+
+**Integrate with your existing Docker stack:**
+
+The `docker-compose.yml` includes commented Traefik labels. Uncomment and configure for automatic HTTPS:
+
+```yaml
+labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.windash.rule=Host(`windash.yourdomain.com`)"
+  - "traefik.http.routers.windash.entrypoints=websecure"
+  - "traefik.http.routers.windash.tls.certresolver=letsencrypt"
+```
+
+**Resource limits** (optional, uncomment in `docker-compose.yml`):
+```yaml
+deploy:
+  resources:
+    limits:
+      cpus: '1'
+      memory: 512M
+```
+
+### 🛠️ Manual Build (Without Docker)
+
+If you need to build locally:
+
+```bash
+# Production build
 pnpm build
+
+# Run production server
+pnpm start
 ```
 
 This creates optimized bundles in `build/`:
@@ -143,7 +213,30 @@ Example backend endpoints needed:
 - [D3.js Documentation](https://d3js.org/)
 - [Vite RSC Plugin](https://github.com/vitejs/vite-plugin-rsc)
 
-## 📄 License
+## � Docker Architecture
+
+### Production Image
+- **Base**: Node.js 20 Alpine (minimal footprint)
+- **Build**: Multi-stage for optimized size (~200MB final image)
+- **Security**: Non-root user, minimal attack surface
+- **Health checks**: Built-in health monitoring
+- **Port**: 3000 (configurable via ENV)
+
+### Development Setup
+- **Hot reload**: Volume mounts for instant code updates
+- **Isolation**: Separate dev and prod configurations
+- **Caching**: Named volumes for `node_modules` and pnpm store
+- **Port**: 5173 (Vite dev server)
+
+### Files Overview
+- `Dockerfile` - Multi-stage production build
+- `Dockerfile.dev` - Development with hot reload
+- `docker-compose.yml` - Production deployment
+- `docker-compose.dev.yml` - Development environment
+- `.dockerignore` - Optimized build context
+- `.devcontainer/` - VS Code Dev Container configuration
+
+## �📄 License
 
 MIT License - feel free to use this project as a learning resource or starting point for your own dashboard applications.
 
