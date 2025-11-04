@@ -45,7 +45,7 @@ export function LiveMetrics({ systemInfo, devices }: LiveMetricsProps) {
       try {
         const newMetrics = await getCurrentMetrics(systemInfo, selectedDeviceId || undefined);
         setMetrics(newMetrics);
-        
+
         // Check if we're getting real data (timestamp should be recent)
         const isRecent = Date.now() - newMetrics.timestamp < 10000; // Within 10 seconds
         setIsLive(isRecent && selectedDeviceId !== null);

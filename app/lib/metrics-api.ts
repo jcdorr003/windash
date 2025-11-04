@@ -3,8 +3,8 @@
 import type { SystemMetrics, SystemInfo } from "~/types/metrics";
 
 // Base URL for API calls (configurable via environment)
-const API_BASE = typeof window !== 'undefined' 
-  ? window.location.origin 
+const API_BASE = typeof window !== 'undefined'
+  ? window.location.origin
   : 'http://localhost:3000';
 
 /**
@@ -33,21 +33,21 @@ export async function getCurrentMetrics(systemInfo: SystemInfo, deviceId?: strin
 
   try {
     const response = await fetch(`${API_BASE}/api/metrics?deviceId=${deviceId}&limit=1`);
-    
+
     if (!response.ok) {
       console.warn('Failed to fetch real metrics, falling back to simulated');
       return getSimulatedMetrics(systemInfo);
     }
 
     const data = await response.json();
-    
+
     if (!data.metrics || data.metrics.length === 0) {
       console.warn('No metrics available, falling back to simulated');
       return getSimulatedMetrics(systemInfo);
     }
 
     const latest = data.metrics[0];
-    
+
     // Transform API response to SystemMetrics format
     return {
       cpuUsage: latest.cpu.total,

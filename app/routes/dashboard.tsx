@@ -27,7 +27,7 @@ export function meta({ }: Route.MetaArgs) {
 export async function ServerComponent() {
   // Fetch system information on the server
   const systemInfo = await getSystemInfo();
-  
+
   // Fetch user's devices
   const tempUserId = "temp-user-1"; // TODO: Replace with real session user
   await ensureTempUser(tempUserId);

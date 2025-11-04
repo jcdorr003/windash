@@ -12,9 +12,9 @@ export async function loader({ request }: { request: Request }) {
 
   try {
     const metrics = await getLatestMetrics(deviceId, limit);
-    
+
     if (metrics.length === 0) {
-      return Response.json({ 
+      return Response.json({
         error: "No metrics found for this device",
         metrics: []
       }, { status: 404 });
@@ -40,10 +40,10 @@ export async function loader({ request }: { request: Request }) {
       uptimeSec: m.uptimeSec,
       procCount: m.procCount
     }));
-    
-    return Response.json({ 
+
+    return Response.json({
       metrics: transformedMetrics,
-      count: transformedMetrics.length 
+      count: transformedMetrics.length
     });
   } catch (error) {
     console.error("Error fetching metrics:", error);
