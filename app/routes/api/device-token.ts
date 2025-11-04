@@ -20,7 +20,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       case "pending":
         return Response.json({ status: "pending" }, { status: 404 }); // 404 for pending (agent polls)
       case "approved":
-        return Response.json({ token: result.token }, { status: 200 });
+        return Response.json({
+          token: result.token,
+          hostId: result.hostId,
+          deviceId: result.deviceId
+        }, { status: 200 });
       default:
         return Response.json({ error: "Unknown status" }, { status: 500 });
     }

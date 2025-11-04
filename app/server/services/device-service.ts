@@ -1,7 +1,7 @@
 import { db } from '../db';
 import { deviceCodes, devices, users } from '../db/schema';
 import { logDebug } from '../utils/log';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 
 // Generate a device code in format XXXX-XXXX
@@ -66,17 +66,17 @@ export async function checkDeviceCode(code: string) {
   }
 
   if (deviceCode.status === 'approved') {
-    // Find device by userId and code
+    // Find device by userId - get most recent device
     const [device] = await db
       .select()
       .from(devices)
       .where(eq(devices.userId, deviceCode.userId!))
-      .orderBy(devices.createdAt)
+      .orderBy(desc(devices.createdAt))
       .limit(1);
 
     if (device) {
-      logDebug('device-code', 'code approved returning token', { code });
-      return { status: 'approved', token: device.token };
+      logDebug('device-code', 'code approved returning token', { code, deviceId: device.id, hostId: device.hostId });
+      return { status: 'approved', token: device.token, hostId: device.hostId, deviceId: device.id };
     }
   }
 
@@ -147,8 +147,18 @@ export async function updateDeviceStatus(deviceId: string, isOnline: boolean) {
 
 // Get user's devices
 export async function getUserDevices(userId: string) {
-  return db
+  const rows = await db
     .select()
     .from(devices)
     .where(eq(devices.userId, userId));
+
+  // Map to API-friendly shape
+  return rows.map(d => ({
+    id: d.id,
+    hostId: d.hostId,
+    name: d.name,
+    isOnline: d.isOnline,
+    lastSeenAt: d.lastSeenAt,
+    createdAt: d.createdAt
+  }));
 }

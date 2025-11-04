@@ -8,4 +8,5 @@ export default [
   // API routes
   route("api/device-codes", "routes/api/device-codes.ts"),
   route("api/device-token", "routes/api/device-token.ts"),
+  route("api/devices", "routes/api/devices.ts"),
 ] satisfies RouteConfig;

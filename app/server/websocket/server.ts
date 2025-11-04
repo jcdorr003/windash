@@ -14,7 +14,22 @@ const connections = new Map<string, AgentConnection>();
 export function setupWebSocketServer(server: Server) {
   const wss = new WebSocketServer({
     server,
-    path: '/agent'
+    path: '/agent',
+    perMessageDeflate: {
+      zlibDeflateOptions: {
+        chunkSize: 1024,
+        memLevel: 7,
+        level: 3
+      },
+      zlibInflateOptions: {
+        chunkSize: 10 * 1024
+      },
+      clientNoContextTakeover: true,
+      serverNoContextTakeover: true,
+      serverMaxWindowBits: 10,
+      concurrencyLimit: 10,
+      threshold: 1024
+    }
   });
 
   wss.on('connection', async (ws, req) => {
@@ -56,6 +71,11 @@ export function setupWebSocketServer(server: Server) {
 
       console.log(`Device connected: ${device.name} (${deviceId})`);
 
+      // Handle ping/pong for keepalive (agent sends ping every 10s)
+      ws.on('ping', () => {
+        ws.pong();
+      });
+
       // Handle messages from agent
       ws.on('message', async (data) => {
         try {
@@ -69,6 +89,9 @@ export function setupWebSocketServer(server: Server) {
             await updateDeviceStatus(deviceId, true);
 
             console.log(`Stored ${message.samples.length} metric samples from ${device.name}`);
+          } else if (message.type === 'ping') {
+            // Handle application-level ping
+            ws.send(JSON.stringify({ type: 'pong', ts: new Date().toISOString() }));
           }
         } catch (error) {
           console.error('Error processing message:', error);
