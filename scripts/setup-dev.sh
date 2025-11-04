@@ -122,10 +122,10 @@ run "docker compose -f $COMPOSE_FILE exec -T $DEV_SERVICE pnpm db:push" || warn 
 
 # Optional seed stub: adjust when a real seeding script exists
 if [[ $NO_SEED == false ]]; then
-  if docker compose -f $COMPOSE_FILE exec -T $DEV_SERVICE pnpm run | grep -q 'seed'; then
-    info "Running seed script"; run "docker compose -f $COMPOSE_FILE exec -T $DEV_SERVICE pnpm seed" || warn "Seed script failed"
+  if docker compose -f $COMPOSE_FILE exec -T $DEV_SERVICE pnpm run | grep -q 'db:seed'; then
+    info "Running seed script"; run "docker compose -f $COMPOSE_FILE exec -T $DEV_SERVICE pnpm db:seed" || warn "Seed script failed"
   else
-    warn "No seed script defined (skipping). Add 'seed' to package.json to enable."
+    warn "No seed script defined (skipping). Add 'db:seed' to package.json to enable."
   fi
 else
   info "Skipping seed step (--no-seed)"
