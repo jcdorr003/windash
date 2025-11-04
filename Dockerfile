@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN pnpm build && pnpm tsc
+RUN pnpm typecheck && pnpm build && pnpm tsc
 
 # Production stage
 FROM node:22-alpine AS runner
