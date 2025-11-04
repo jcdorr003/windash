@@ -7,7 +7,6 @@
 import { ensureTempUser } from "../app/server/services/device-service.js";
 import { db } from "../app/server/db/index.js";
 import { devices, metrics } from "../app/server/db/schema.js";
-import { eq } from "drizzle-orm";
 
 async function seed() {
   console.log("🌱 Seeding database...");
