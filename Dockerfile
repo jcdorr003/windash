@@ -34,7 +34,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install production dependencies only (include tsx for running TypeScript server files)
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile \
+  && rm -rf /root/.cache/node/corepack
 
 # Copy built assets from builder stage
 COPY --from=builder /app/build ./build
