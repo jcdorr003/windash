@@ -19,7 +19,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN pnpm build
+RUN pnpm build && pnpm tsc
 
 # Production stage
 FROM node:22-alpine AS runner
@@ -41,6 +41,7 @@ RUN pnpm install --prod --frozen-lockfile \
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/build/server ./build/server
 COPY drizzle.config.ts ./
 COPY scripts ./scripts
 

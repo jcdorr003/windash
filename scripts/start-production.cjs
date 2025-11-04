@@ -13,7 +13,7 @@ console.log('Starting WinDash Production Server...');
 // Run migrations first
 // Start WebSocket server in background
 console.log('Starting WebSocket server on port', process.env.WS_PORT || 3001);
-const wsServer = spawn('pnpm', ['exec', 'tsx', 'app/server/websocket-server.ts'], {
+const wsServer = spawn('node', ['build/server/app/server/websocket-server.js'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env }

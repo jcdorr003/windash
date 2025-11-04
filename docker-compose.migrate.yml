@@ -22,14 +22,10 @@ services:
       - "5432:5432"
 
   migrate:
-    image: node:22-alpine
+    image: jcdorr3/windash-migrate:latest
     container_name: windash-migrate
-    working_dir: /app
-    volumes:
-      - .:/app
     environment:
       - DATABASE_URL=postgres://windash:windash@postgres:5432/windash
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm db:push"
     depends_on:
       postgres:
         condition: service_healthy
