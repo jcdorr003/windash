@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
+    "build": "react-router build && pnpm build:ws",
     "dev": "concurrently \"pnpm:dev:app\" \"pnpm:dev:ws\"",
     "dev:app": "react-router dev",
     "dev:ws": "tsx watch app/server/websocket-server.ts",
     "start": "node scripts/start-production.js",
     "start:app": "react-router-serve build/server/index.js",
     "start:ws": "tsx app/server/websocket-server.ts",
+    "build:ws": "tsup app/server/websocket-server.ts --format esm --platform=node --target=node22 --sourcemap --out-dir build/ws --clean",
     "typecheck": "react-router typegen && tsc",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -51,6 +52,11 @@
     "vite": "7.1.6",
     "vite-plugin-devtools-json": "1.0.0",
     "vite-tsconfig-paths": "5.1.4",
-    "drizzle-kit": "^0.31.6"
+    "drizzle-kit": "^0.31.6",
+    "tsup": "^8.3.0"
+  },
+  "engines": {
+    "node": "22.x",
+    "pnpm": "10.x"
   }
 }

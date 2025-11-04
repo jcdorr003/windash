@@ -25,11 +25,13 @@ services:
     image: node:22-alpine
     container_name: windash-migrate
     working_dir: /app
+    # Run only when explicitly invoked (prevents always showing as 'exited' in dashboards like Dockge)
+    profiles: ["migrate"]
     volumes:
-      - .:/app
+      - .:/app:ro
     environment:
       - DATABASE_URL=postgres://windash:windash@postgres:5432/windash
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm db:push"
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install --frozen-lockfile && pnpm db:push"
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,9 +55,12 @@ services:
       - DATABASE_URL=postgres://windash:windash@postgres:5432/windash
     networks:
       - windash-network
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
+    # If you want automatic migration on every up, keep depends_on pointing to migrate.
+    # To avoid an 'exited(0)' container cluttering UI, we remove the dependency and
+    # run migration as a one-off: `docker compose --profile migrate run --rm migrate` before starting.
+    # depends_on:
+    #   migrate:
+    #     condition: service_completed_successfully
     # Uncomment for resource limits
     # deploy:
     #   resources:

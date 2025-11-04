@@ -18,8 +18,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the application
-RUN pnpm typecheck && pnpm build && pnpm tsc
+# Build (typegen + bundle app + bundle websocket)
+RUN pnpm typecheck && pnpm build
 
 # Production stage
 FROM node:22-alpine AS runner

@@ -1,6 +1,6 @@
-import { db } from '../db/index.js';
-import { deviceCodes, devices, users } from '../db/schema.js';
-import { logDebug } from '../utils/log.js';
+import { db } from '../db';
+import { deviceCodes, devices, users } from '../db/schema';
+import { logDebug } from '../utils/log';
 import { eq, desc } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 

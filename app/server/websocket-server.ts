@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { setupWebSocketServer } from './websocket/server.js';
+import { setupWebSocketServer } from './websocket/server';
 
 const PORT = process.env.WS_PORT || 3001;
 

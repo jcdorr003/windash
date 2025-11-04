@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from './schema.js';
+import * as schema from './schema';
 
 // Database connection
 const connectionString = process.env.DATABASE_URL || 'postgres://windash:windash@localhost:5432/windash';

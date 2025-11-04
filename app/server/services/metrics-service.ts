@@ -1,5 +1,5 @@
-import { db } from '../db/index.js';
-import { metrics } from '../db/schema.js';
+import { db } from '../db';
+import { metrics } from '../db/schema';
 import { eq, desc, lt } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 
