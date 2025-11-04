@@ -20,9 +20,6 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
-      drizzle-kit:
-        specifier: ^0.31.6
-        version: 0.31.6
       drizzle-orm:
         specifier: ^0.44.7
         version: 0.44.7(postgres@3.4.7)
@@ -38,9 +35,6 @@ importers:
       react-router:
         specifier: 7.9.2
         version: 7.9.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      tsx:
-        specifier: ^4.20.6
-        version: 4.20.6
       ws:
         specifier: ^8.18.3
         version: 8.18.3
@@ -75,9 +69,15 @@ importers:
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
+      drizzle-kit:
+        specifier: ^0.31.6
+        version: 0.31.6
       tailwindcss:
         specifier: 4.1.13
         version: 4.1.13
+      tsx:
+        specifier: ^4.20.6
+        version: 4.20.6
       typescript:
         specifier: 5.9.2
         version: 5.9.2
