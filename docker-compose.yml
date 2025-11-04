@@ -41,7 +41,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "node app/server/websocket-server.js & pnpm start"
     # Uncomment for resource limits
     # deploy:
     #   resources:

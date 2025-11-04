@@ -1,5 +1,6 @@
 import { db } from '../db';
-import { deviceCodes, devices } from '../db/schema';
+import { deviceCodes, devices, users } from '../db/schema';
+import { logDebug } from '../utils/log';
 import { eq } from 'drizzle-orm';
 import { randomBytes } from 'crypto';
 
@@ -31,11 +32,13 @@ export async function createDeviceCode(userId?: string) {
     expiresAt,
   });
 
+  logDebug('device-code', 'created new code', { code, userId, expiresAt });
   return { code, expiresAt: expiresAt.toISOString() };
 }
 
 // Check device code status and return token if approved
 export async function checkDeviceCode(code: string) {
+  logDebug('device-code', 'checking code status', { code });
   const [deviceCode] = await db
     .select()
     .from(deviceCodes)
@@ -43,6 +46,7 @@ export async function checkDeviceCode(code: string) {
     .limit(1);
 
   if (!deviceCode) {
+    logDebug('device-code', 'code not found', { code });
     return { status: 'not_found' };
   }
 
@@ -52,10 +56,12 @@ export async function checkDeviceCode(code: string) {
       .update(deviceCodes)
       .set({ status: 'expired' })
       .where(eq(deviceCodes.code, code));
+    logDebug('device-code', 'code expired', { code });
     return { status: 'expired' };
   }
 
   if (deviceCode.status === 'pending') {
+    logDebug('device-code', 'code still pending', { code });
     return { status: 'pending' };
   }
 
@@ -69,6 +75,7 @@ export async function checkDeviceCode(code: string) {
       .limit(1);
 
     if (device) {
+      logDebug('device-code', 'code approved returning token', { code });
       return { status: 'approved', token: device.token };
     }
   }
@@ -78,6 +85,7 @@ export async function checkDeviceCode(code: string) {
 
 // Approve a device code and create device
 export async function approveDeviceCode(code: string, userId: string, hostId: string, deviceName: string) {
+  logDebug('device-approve', 'approving code', { code, userId, hostId, deviceName });
   // Update code status
   await db
     .update(deviceCodes)
@@ -97,7 +105,21 @@ export async function approveDeviceCode(code: string, userId: string, hostId: st
     isOnline: false,
   });
 
+  logDebug('device-approve', 'device created', { deviceId, token });
   return { deviceId, token };
+}
+
+// Ensure a temporary/dev user exists (for environments before auth implementation)
+export async function ensureTempUser(userId: string) {
+  const [existing] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (existing) return existing.id;
+
+  // Minimal placeholder values to satisfy NOT NULL constraints
+  const email = `${userId}@example.dev`;
+  const passwordHash = 'dev-temp'; // Replace with a real hash when auth implemented
+  await db.insert(users).values({ id: userId, email, passwordHash, name: 'Temp User' });
+  logDebug('user', 'temp user created', { userId, email });
+  return userId;
 }
 
 // Validate bearer token and return device

@@ -1,6 +1,26 @@
 version: '3.9'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: windash-postgres-dev
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=windash
+      - POSTGRES_PASSWORD=windash
+      - POSTGRES_DB=windash
+    volumes:
+      - postgres-data-dev:/var/lib/postgresql/data
+    networks:
+      - windash-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U windash"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
   windash-dev:
     build:
       context: .
@@ -8,6 +28,7 @@ services:
     container_name: windash-dev
     ports:
       - "5173:5173"
+      - "3001:3001"
     volumes:
       # Mount source code for hot reload
       - .:/workspace:cached
@@ -17,15 +38,21 @@ services:
       - pnpm-store:/home/node/.local/share/pnpm/store
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=postgres://windash:windash@postgres:5432/windash
+      - WS_PORT=3001
     command: pnpm dev
     networks:
       - windash-dev-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     stdin_open: true
     tty: true
 
 volumes:
   node_modules:
   pnpm-store:
+  postgres-data-dev:
 
 networks:
   windash-dev-network:

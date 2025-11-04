@@ -33,11 +33,15 @@ WORKDIR /app
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install production dependencies only
+# Install production dependencies only (include tsx for running TypeScript server files)
 RUN pnpm install --prod --frozen-lockfile
 
 # Copy built assets from builder stage
 COPY --from=builder /app/build ./build
+COPY --from=builder /app/app ./app
+COPY --from=builder /app/drizzle ./drizzle
+COPY drizzle.config.ts ./
+COPY scripts ./scripts
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -59,4 +63,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["node", "scripts/start-production.js"]

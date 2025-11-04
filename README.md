@@ -80,6 +80,39 @@ pnpm dev
 
 Visit `http://localhost:5173` to see your dashboard with live simulated metrics.
 
+### 🧪 Dev Stack Helper Scripts
+
+This repo includes helper scripts to spin up and tear down the development Docker stack.
+
+Dev setup:
+```bash
+pnpm dev:stack              # Start dev stack, wait for Postgres + dev server
+pnpm dev:stack:rebuild      # Rebuild the dev image then start
+pnpm dev:stack:wipe         # Wipe Postgres dev data volume, then start fresh
+```
+
+Direct script usage (advanced):
+```bash
+scripts/setup-dev.sh --wait --rebuild           # Rebuild and wait for readiness
+scripts/setup-dev.sh --wipe-db --no-seed --wait # Fresh DB without seeding
+scripts/setup-dev.sh --dry-run                  # Show planned actions
+```
+
+Cleanup / teardown:
+```bash
+pnpm clean:dev               # Stop dev containers only
+pnpm clean:dev:full          # Stop + remove volumes + image (destructive)
+```
+
+Script details:
+- `scripts/setup-dev.sh` handles: optional volume wipe, rebuild, pulling images, running migrations (`pnpm db:push`), optional seed.
+- `scripts/cleanup.sh` safely stops stacks with opt-in flags for volumes/images/networks.
+
+Safety notes:
+- Volumes are preserved unless you use `--wipe-db` (setup) or `--with-volumes` (cleanup).
+- Use `--dry-run` first for preview before destructive operations.
+- Add a `seed` script to `package.json` if you want automatic dev data seeding.
+
 ## 📦 Building & Deployment
 
 ### 🐳 Docker Deployment (Recommended)
