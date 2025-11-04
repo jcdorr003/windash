@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
-import { validateDeviceToken, updateDeviceStatus } from '../services/device-service';
-import { storeMetricsBatch, type MetricSample } from '../services/metrics-service';
+import { validateDeviceToken, updateDeviceStatus } from '../services/device-service.js';
+import { storeMetricsBatch, type MetricSample } from '../services/metrics-service.js';
 
 interface AgentConnection {
   deviceId: string;
