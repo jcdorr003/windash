@@ -22,9 +22,9 @@ export async function action({ request, params }: { request: Request; params: { 
       return Response.json({ error: "Device not found" }, { status: 404 });
     }
 
-    return Response.json({ 
-      success: true, 
-      message: `Device ${result[0].name} unpaired successfully` 
+    return Response.json({
+      success: true,
+      message: `Device ${result[0].name} unpaired successfully`
     });
   } catch (error) {
     console.error("Error unpairing device:", error);
