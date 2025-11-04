@@ -1,0 +1,15 @@
+# Dedicated migration image for Windash
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Copy package files and install all dependencies (including dev)
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN pnpm install
+
+# Copy the rest of the source code (including migration scripts)
+COPY . .
+
+# Run migrations on container start
+ENTRYPOINT ["pnpm", "db:push"]

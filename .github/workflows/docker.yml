@@ -33,3 +33,15 @@ jobs:
             jcdorr3/windash:latest
             jcdorr3/windash:${{ github.ref_name }}
 
+      - name: Build and push migration image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.migrate
+          push: true
+          provenance: true
+          sbom: true
+          tags: |
+            jcdorr3/windash-migrate:latest
+            jcdorr3/windash-migrate:${{ github.ref_name }}
+
