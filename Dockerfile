@@ -41,7 +41,6 @@ RUN pnpm install --prod --frozen-lockfile \
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/drizzle ./drizzle
-COPY --from=builder /app/build/server ./build/server
 COPY drizzle.config.ts ./
 COPY scripts ./scripts
 
