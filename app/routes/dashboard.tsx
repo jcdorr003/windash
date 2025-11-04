@@ -1,5 +1,6 @@
 import type { Route } from "./+types/dashboard";
 import { getSystemInfo } from "~/lib/metrics-api";
+import { ensureTempUser, getUserDevices } from "~/server/services/device-service";
 import { StatusBar } from "~/components/dashboard/StatusBar";
 import { CpuCard } from "~/components/dashboard/CpuCard";
 import { MemoryCard } from "~/components/dashboard/MemoryCard";
@@ -25,8 +26,12 @@ export function meta({ }: Route.MetaArgs) {
  */
 export async function ServerComponent() {
   // Fetch system information on the server
-  // In production, this could come from your backend API or database
   const systemInfo = await getSystemInfo();
+  
+  // Fetch user's devices
+  const tempUserId = "temp-user-1"; // TODO: Replace with real session user
+  await ensureTempUser(tempUserId);
+  const devices = await getUserDevices(tempUserId);
 
   return (
     <div className="bg-gray-900 text-gray-100 p-4 sm:p-8 min-h-screen">
@@ -37,15 +42,46 @@ export async function ServerComponent() {
             Windows Performance Monitor
           </h1>
           <p className="text-gray-400">
-            Real-Time Metrics Visualization (React + D3)
+            Real-Time Metrics Visualization
           </p>
         </header>
+
+        {/* Device count info */}
+        {devices.length > 0 && (
+          <div className="mb-6 p-4 bg-gray-800 rounded-lg border border-green-500/30">
+            <p className="text-green-400">
+              📡 {devices.length} device{devices.length !== 1 ? 's' : ''} paired
+              {devices.filter(d => d.isOnline).length > 0 && (
+                <span className="ml-2 text-green-300">
+                  ({devices.filter(d => d.isOnline).length} online)
+                </span>
+              )}
+            </p>
+          </div>
+        )}
+
+        {devices.length === 0 && (
+          <div className="mb-6 p-6 bg-yellow-900/20 rounded-lg border border-yellow-500/30">
+            <h3 className="text-xl font-bold text-yellow-400 mb-2">
+              No Devices Paired
+            </h3>
+            <p className="text-gray-300 mb-4">
+              To start monitoring your Windows PC, pair the WinDash agent:
+            </p>
+            <ol className="list-decimal list-inside space-y-2 text-gray-300 ml-4">
+              <li>Run the WinDash agent on your Windows PC</li>
+              <li>The agent will display a pairing code</li>
+              <li>Visit the pairing URL shown by the agent to approve</li>
+              <li>Once paired, metrics will appear here automatically</li>
+            </ol>
+          </div>
+        )}
 
         {/* Status Bar - Server Component (static structure) */}
         <StatusBar systemInfo={systemInfo} />
 
         {/* Live Metrics - Client Component (handles real-time updates) */}
-        <LiveMetrics systemInfo={systemInfo} />
+        <LiveMetrics systemInfo={systemInfo} devices={devices} />
 
         {/* Metric Cards Grid - Server Components (static structure) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -56,35 +92,6 @@ export async function ServerComponent() {
 
         {/* Real-Time Charts - Client Component (D3 visualization) */}
         <RealTimeCharts systemInfo={systemInfo} />
-
-        {/* Instructions for connecting real backend */}
-        <div className="mt-8 p-6 bg-gray-800 rounded-xl border border-yellow-500/30">
-          <h3 className="text-xl font-bold text-yellow-400 mb-3">
-            🔧 Integration Notes
-          </h3>
-          <div className="text-gray-300 space-y-2 text-sm">
-            <p>
-              <strong>Currently using simulated data.</strong> To connect to your Windows PC:
-            </p>
-            <ol className="list-decimal list-inside space-y-1 ml-4">
-              <li>
-                Create a backend API on your Windows PC (Node.js, Python, etc.) that
-                exposes endpoints for system metrics
-              </li>
-              <li>
-                Update <code className="bg-gray-700 px-2 py-1 rounded">app/lib/metrics-api.ts</code> to
-                call your real API endpoints
-              </li>
-              <li>
-                The client components in{" "}
-                <code className="bg-gray-700 px-2 py-1 rounded">
-                  app/components/dashboard/
-                </code>{" "}
-                will automatically use the real data
-              </li>
-            </ol>
-          </div>
-        </div>
       </div>
     </div>
   );

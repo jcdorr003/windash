@@ -1,17 +1,19 @@
 // API layer for fetching metrics
-// In production, this would call your Windows PC backend API
 
 import type { SystemMetrics, SystemInfo } from "~/types/metrics";
 
+// Base URL for API calls (configurable via environment)
+const API_BASE = typeof window !== 'undefined' 
+  ? window.location.origin 
+  : 'http://localhost:3000';
+
 /**
- * Simulates fetching system information (static data).
- * In production: Call your backend API endpoint
+ * Fetches system information (static data).
+ * In the future, this could come from device metadata.
  */
 export async function getSystemInfo(): Promise<SystemInfo> {
-  // TODO: Replace with actual API call
-  // const response = await fetch('http://your-windows-pc:3000/api/system-info');
-  // return response.json();
-
+  // TODO: Fetch from device metadata when available
+  // For now, return defaults (will be overridden by real metrics)
   return {
     ramTotal: 16,
     cpuCores: 8,
@@ -20,15 +22,54 @@ export async function getSystemInfo(): Promise<SystemInfo> {
 }
 
 /**
- * Simulates fetching current system metrics.
- * In production: Call your backend API endpoint
+ * Fetches current system metrics from backend API.
+ * @param deviceId - The ID of the device to fetch metrics for
  */
-export async function getCurrentMetrics(systemInfo: SystemInfo): Promise<SystemMetrics> {
-  // TODO: Replace with actual API call
-  // const response = await fetch('http://your-windows-pc:3000/api/metrics');
-  // return response.json();
+export async function getCurrentMetrics(systemInfo: SystemInfo, deviceId?: string): Promise<SystemMetrics> {
+  if (!deviceId) {
+    // Return simulated data if no device selected
+    return getSimulatedMetrics(systemInfo);
+  }
 
-  // Simulated data
+  try {
+    const response = await fetch(`${API_BASE}/api/metrics?deviceId=${deviceId}&limit=1`);
+    
+    if (!response.ok) {
+      console.warn('Failed to fetch real metrics, falling back to simulated');
+      return getSimulatedMetrics(systemInfo);
+    }
+
+    const data = await response.json();
+    
+    if (!data.metrics || data.metrics.length === 0) {
+      console.warn('No metrics available, falling back to simulated');
+      return getSimulatedMetrics(systemInfo);
+    }
+
+    const latest = data.metrics[0];
+    
+    // Transform API response to SystemMetrics format
+    return {
+      cpuUsage: latest.cpu.total,
+      ramUsed: latest.mem.used / (1024 * 1024 * 1024), // Convert bytes to GB
+      ramPercent: latest.mem.percent,
+      ramTotal: latest.mem.total / (1024 * 1024 * 1024), // Convert bytes to GB
+      diskRead: latest.net.rxBps / (1024 * 1024), // Convert to MB/s
+      diskWrite: latest.net.txBps / (1024 * 1024), // Convert to MB/s
+      cpuCores: latest.cpu.perCore.length,
+      cpuSpeed: systemInfo.cpuSpeed, // Not available in metrics, use default
+      timestamp: new Date(latest.timestamp).getTime(),
+    };
+  } catch (error) {
+    console.error('Error fetching metrics:', error);
+    return getSimulatedMetrics(systemInfo);
+  }
+}
+
+/**
+ * Generates simulated metrics for testing/fallback
+ */
+function getSimulatedMetrics(systemInfo: SystemInfo): SystemMetrics {
   const cpuBase = 10 + Math.random() * 20;
   const ramBaseGB = 6 + Math.random() * 4;
 

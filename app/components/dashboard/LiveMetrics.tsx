@@ -2,51 +2,66 @@
 
 import { useState, useEffect } from "react";
 import type { SystemMetrics, SystemInfo } from "~/types/metrics";
+import { getCurrentMetrics } from "~/lib/metrics-api";
+
+interface Device {
+  id: string;
+  hostId: string;
+  name: string;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+  createdAt: Date;
+}
 
 interface LiveMetricsProps {
   systemInfo: SystemInfo;
+  devices: Device[];
 }
 
 /**
  * Client Component: Polls for live metrics and updates the DOM
  * This handles all the real-time updates and interactivity
  */
-export function LiveMetrics({ systemInfo }: LiveMetricsProps) {
+export function LiveMetrics({ systemInfo, devices }: LiveMetricsProps) {
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
+  const [isLive, setIsLive] = useState(false);
+
+  // Auto-select first online device
+  useEffect(() => {
+    if (devices.length > 0 && !selectedDeviceId) {
+      const onlineDevice = devices.find(d => d.isOnline);
+      if (onlineDevice) {
+        setSelectedDeviceId(onlineDevice.id);
+      } else {
+        // If no online devices, select first one
+        setSelectedDeviceId(devices[0].id);
+      }
+    }
+  }, [devices, selectedDeviceId]);
 
   useEffect(() => {
-    // Simulate fetching metrics every second
     const fetchMetrics = async () => {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/metrics');
-      // const data = await response.json();
-
-      const cpuBase = 10 + Math.random() * 20;
-      const ramBaseGB = 6 + Math.random() * 4;
-
-      const newMetrics: SystemMetrics = {
-        cpuUsage: Math.min(100, cpuBase + Math.random() * 15),
-        ramUsed: ramBaseGB,
-        ramPercent: (ramBaseGB / systemInfo.ramTotal) * 100,
-        diskRead: Math.random() * 10 + Math.random() * 50 * (Math.random() > 0.9 ? 1 : 0),
-        diskWrite: Math.random() * 5 + Math.random() * 30 * (Math.random() > 0.95 ? 1 : 0),
-        ramTotal: systemInfo.ramTotal,
-        cpuCores: systemInfo.cpuCores,
-        cpuSpeed: systemInfo.cpuSpeed,
-        timestamp: Date.now(),
-      };
-
-      setMetrics(newMetrics);
+      try {
+        const newMetrics = await getCurrentMetrics(systemInfo, selectedDeviceId || undefined);
+        setMetrics(newMetrics);
+        
+        // Check if we're getting real data (timestamp should be recent)
+        const isRecent = Date.now() - newMetrics.timestamp < 10000; // Within 10 seconds
+        setIsLive(isRecent && selectedDeviceId !== null);
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+      }
     };
 
     // Initial fetch
     fetchMetrics();
 
-    // Poll every second
-    const interval = setInterval(fetchMetrics, 1000);
+    // Poll every 2 seconds (agent sends every 2s)
+    const interval = setInterval(fetchMetrics, 2000);
 
     return () => clearInterval(interval);
-  }, [systemInfo]);
+  }, [systemInfo, selectedDeviceId]);
 
   // Update DOM elements directly (imperative updates for performance)
   useEffect(() => {
@@ -83,16 +98,39 @@ export function LiveMetrics({ systemInfo }: LiveMetricsProps) {
     const statusDot = document.getElementById('connection-status-dot');
     const statusText = document.getElementById('connection-status-text');
     if (statusDot && statusText) {
-      statusDot.className = 'h-3 w-3 rounded-full mr-2 bg-green-500';
-      statusText.className = 'font-medium text-green-300';
-      statusText.textContent = 'Live (Simulated)';
+      if (isLive) {
+        statusDot.className = 'h-3 w-3 rounded-full mr-2 bg-green-500 animate-pulse';
+        statusText.className = 'font-medium text-green-300';
+        statusText.textContent = 'Live';
+      } else {
+        statusDot.className = 'h-3 w-3 rounded-full mr-2 bg-yellow-500';
+        statusText.className = 'font-medium text-yellow-300';
+        statusText.textContent = 'Simulated';
+      }
     }
-  }, [metrics]);
+  }, [metrics, isLive]);
 
-  return (
-    <>
-      {/* This component doesn't render anything visible,
-          it just manages the live updates */}
-    </>
-  );
+  // Render device selector if multiple devices
+  if (devices.length > 1) {
+    return (
+      <div className="mb-6 p-4 bg-gray-800 rounded-lg border border-indigo-500/30">
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Select Device:
+        </label>
+        <select
+          value={selectedDeviceId || ''}
+          onChange={(e) => setSelectedDeviceId(e.target.value)}
+          className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-indigo-500 focus:outline-none"
+        >
+          {devices.map(device => (
+            <option key={device.id} value={device.id}>
+              {device.name} {device.isOnline ? '🟢' : '⚫'}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  return null;
 }

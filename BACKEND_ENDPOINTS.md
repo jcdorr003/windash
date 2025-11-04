@@ -7,7 +7,7 @@
 
 **Request:**
 ```bash
-curl -X POST https://windash.jcdorr3.dev/api/device-codes
+curl -X POST http://192.168.1.57:3004/api/device-codes
 ```
 
 **Response (201):**
@@ -30,7 +30,7 @@ curl -X POST https://windash.jcdorr3.dev/api/device-codes
 
 **Request:**
 ```bash
-curl "https://windash.jcdorr3.dev/api/device-token?code=ABCD-1234"
+curl "http://192.168.1.57:3004/api/device-token?code=ABCD-1234"
 ```
 
 **Responses:**
@@ -78,7 +78,7 @@ curl "https://windash.jcdorr3.dev/api/device-token?code=ABCD-1234"
 
 **Request:**
 ```bash
-curl https://windash.jcdorr3.dev/api/devices
+curl http://192.168.1.57:3004/api/devices
 ```
 
 **Response (200):**
@@ -99,12 +99,12 @@ curl https://windash.jcdorr3.dev/api/devices
 
 ---
 
-### 4. WebSocket: wss://windash.jcdorr3.dev/agent
+### 4. WebSocket: ws://192.168.1.57:3005/agent
 **Purpose:** Real-time metrics streaming from agent to server
 
 **Connection:**
 ```
-URL: wss://windash.jcdorr3.dev/agent?hostId=<hostId>
+URL: ws://192.168.1.57:3005/agent?hostId=<hostId>
 Headers:
   Authorization: Bearer <token>
 ```
@@ -254,22 +254,22 @@ Headers:
 
 ### 1. Request a pairing code:
 ```bash
-curl -X POST https://windash.jcdorr3.dev/api/device-codes
+curl -X POST http://192.168.1.57:3004/api/device-codes
 ```
 
 ### 2. Approve the code:
-- Open browser: `https://windash.jcdorr3.dev/pair?code=<CODE>`
+- Open browser: `http://192.168.1.57:3004/pair?code=<CODE>`
 - Enter device name and click "Approve"
 
 ### 3. Poll for token:
 ```bash
-curl "https://windash.jcdorr3.dev/api/device-token?code=<CODE>"
+curl "http://192.168.1.57:3004/api/device-token?code=<CODE>"
 ```
 
 ### 4. Connect WebSocket:
 ```bash
 # Using wscat (install: npm install -g wscat)
-wscat -c "wss://windash.jcdorr3.dev/agent?hostId=test-host" \
+wscat -c "ws://192.168.1.57:3005/agent?hostId=test-host" \
   -H "Authorization: Bearer <TOKEN>"
 ```
 
